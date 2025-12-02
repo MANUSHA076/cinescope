@@ -1,6 +1,7 @@
 import FeaturedMovies from "@/component/landing/featured-movies";
 import HeroBanner from "@/component/landing/hero-banner";
 import { MainNav } from "@/component/main-nav";
+import Footer from "@/component/shared/footer";
 //import Image from "next/image";
 //import Link from "next/link";
 
@@ -14,7 +15,8 @@ export default function HomePage() {
      <main className="">
     
         <HeroBanner />
-        <FeaturedMovies/>
+        <FeaturedMovies />
+        <Footer />
       </main>
     
    </div>      

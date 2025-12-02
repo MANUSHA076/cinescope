@@ -1,5 +1,5 @@
 // component/main-nav.tsx
-import { Logo } from "./logo";
+import { Logo } from "./shared/logo";
 import Link from "next/link"
 import { ModeToggle } from "./mode-toggle";
 export function MainNav() {
@@ -13,10 +13,10 @@ export function MainNav() {
         </Link>
         <nav className="ml-auto flex gap-4 items-center">
 
-          <Link href="/movies">Movies</Link>
-          <Link href="/genres">Genres</Link>
-          <Link href="/counter">About</Link>
-          <Link href="/movies">Admin</Link>
+          <Link href="/movies" className="hover:text-primary text-sm font-medium transition-colors">Movies</Link>
+          <Link href="/genres" className="hover:text-primary text-sm font-medium transition-colors">Genres</Link>
+          <Link href="/counter" className="hover:text-primary text-sm font-medium transition-colors">About</Link>
+          <Link href="/movies" className="hover:text-primary text-sm font-medium transition-colors">Admin</Link>
           
  
             <ModeToggle />
