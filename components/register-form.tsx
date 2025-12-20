@@ -1,101 +1,120 @@
-"use client"
-import { useActionState } from "react";
+"use client";
+
+import { registerUser } from "@/actions/auth";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { registerUser } from "@/actions/auth";
+  FieldError,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
+type RegisterState = {
+  success: boolean | null;
+  message: string | null;
+  field: "name" | "email" | "password" | "general" | null;
+};
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
 
-     const [state, formAction, isPending] = useActionState(registerUser, {
-    success: null,
-    message: null,
-  });
+  const [state, formAction, isPending] = useActionState<RegisterState>(
+    registerUser,
+    {
+      success: null,
+      message: null,
+      field: null,
+    }
+  );
 
-  // const handleSignUp = async (formData: FormData) => {
-  //   "use server";
-  //   const name = formData.get("name") as string;
-  //   const email = formData.get("email") as string;
-  //   const password = formData.get("password") as string;
-  // };
-
- 
-  console.log("Registration state:", state, "isPending:", isPending);
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/dashboard");
+    }
+  }, [state, router]);
 
   return (
-    <div className={cn("flex flex-col gap-6",)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg capitalize">Create your your account</CardTitle>
+          <CardTitle className="text-lg capitalize">
+            Create your account
+          </CardTitle>
           <CardDescription>
-            Enter your email below to create your account
+            Enter your information below to create your account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form action={formAction}>
             <FieldGroup className="gap-4">
-               <Field>
-                <FieldLabel htmlFor="email">Name</FieldLabel>
-                <Input
-                  id="name"
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  required
-                />
+
+              {/* Name */}
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input id="name" name="name" type="text" placeholder="Your Name" />
+                <FieldError className="text-xs">
+                  {state?.field === "name" && state?.message}
+                </FieldError>
               </Field>
+
+              {/* Email */}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="john@example.com"
-                  required
-                />
+                <Input id="email" name="email" type="email" placeholder="john@example.com" />
+                <FieldError className="text-xs">
+                  {state?.field === "email" && state?.message}
+                </FieldError>
               </Field>
+
+              {/* Password */}
               <Field>
-               
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                 
-                <Input id="password" name="password" type="password" required />
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Input id="password" name="password" type="password" />
+                <FieldError className="text-xs">
+                  {state?.field === "password" && state?.message}
+                </FieldError>
               </Field>
-              <Field>
-                <Button type="submit" className="cursor-pointer">Register</Button>
-                <Button variant="outline" type="submit"
-                
-                  className="cursor-pointer" disabled={isPending}>
-                  Continue with Google
-                  
+
+              {/* Buttons */}
+              <Field className="flex flex-col gap-2">
+                <FieldError className="text-xs text-center">
+                  {state?.field === "general" && state?.message}
+                </FieldError>
+
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Registering..." : "Register"}
                 </Button>
+
+                <Button variant="outline" type="button" disabled={isPending}>
+                  Continue with Google
+                </Button>
+
                 <FieldDescription className="text-center">
                   Already have an account? <Link href="/login">Login</Link>
                 </FieldDescription>
               </Field>
+
             </FieldGroup>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
-
