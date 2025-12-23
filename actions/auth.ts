@@ -1,121 +1,146 @@
 "use server";
-import { Field } from "@/components/ui/field";
-import { signUp, signIn, signOut } from "@/lib/auth-client";
 
-//import { redirect ,RedirectType} from "next/navigation";
-//server action to log in user
-export const registerUser = async (prevState: string[], formData: FormData) => {
-  if (formData) {
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+import { auth } from "@/lib/auth";
 
-    if (!email) {
-      return { success: false, message: "Email is required.", field: "email" };
-    }
-    if (!password) {
-      return { success: false, message: "Password is required.", field: "password" };
-    }
-    if (!name) {
-      return { success: false, message: "Name is required.", field: "name" };
-    }
-
-   
-
- console.log("Registering user with:", { name, email, password });
-    try {
-      const { error } = await signUp.email(
-        {
-          email,
-          password,
-          name,
-          image: undefined,
-          callbackURL: "/dashboard",
-        },
-        {
-          onError: (ctx) => {
-            console.error("Registration error:", ctx.error);
-          },
-        }
-      );
-
-      return {
-        success: !error,
-        message: error ? error.message : "Registration successful.",
-        field: error && "general"
-      };
-    } catch (error) {
-      console.error("Error registering user:", error);
-
-      return { success: false, message: "Registration failed." };
-    }
-  }
+/* =========================
+   TYPES
+========================= */
+type ActionState = {
+  success: boolean;
+  message: string;
+  field?: "name" | "email" | "password" | "general";
 };
 
-export const loginUser = async (prevState: string[], formData: FormData) => {
-  
-  if (formData) {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    if (!email) {
-      return { success: false, message: "Email is required." };
-      if (!password) {
-        return { success: false, message: "Password is required.", field: "password" };
-      }
-    }
-   
-    try {
-      // Implement logout logic here
-      const { error } = await signIn.email(
-        {
-          email,
-          password,
-          rememberMe: true,
-          callbackURL: "/dashboard",
-        },
-        {
-          onSuccess: (ctx) => {
-            console.log("User logged in successfully");
-            
-            //redirect("/dashboard", RedirectType.push);
-          },
-
-
-          onError: (ctx) => {
-            console.error("Logout error:", ctx.error);
-          },
-        }
-    
-      );
-      return {
-        success: !error,
-        message: error ? error.message : "Login successful.",
-        field: error && "general"
-      };
-    } catch (error) {
-      console.error("Error logging  user:", error);
-      return { success: false, message: "Login failed." };
-    }
-  }
-
-
-};
-
-export const logoutUser = async () => {
-  try {
-// Implement logout logic here
-     await signOut({
-       fetchOptions: {
-         onSuccess: () => {
-           console.log("User logged out successfully");
-           //redirect loging page
-         },
-       },
-    });
-    
-  } catch (error) {
-    console.error("Error logging out user:", error);
-    return { success: false, message: "Logout failed." };
-  } 
-
+type BetterAuthError = {
+  message?: string;
+  body?: {
+    message?: string;
+    code?: string;
   };
+};
+
+/* =========================
+   REGISTER USER
+========================= */
+export const registerUser = async (
+  prevState: ActionState | null,
+  formData: FormData
+): Promise<ActionState> => {
+  const name = formData.get("name")?.toString().trim();
+  const email = formData.get("email")?.toString().trim();
+  const password = formData.get("password")?.toString();
+
+  if (!name) {
+    return { success: false, message: "Name is required.", field: "name" };
+  }
+
+  if (!email) {
+    return { success: false, message: "Email is required.", field: "email" };
+  }
+
+  if (!password) {
+    return { success: false, message: "Password is required.", field: "password" };
+  }
+
+  try {
+    await auth.api.signUpEmail({
+      body: { name, email, password },
+    });
+
+    return {
+      success: true,
+      message: "User registered successfully.",
+      field: "general",
+    };
+  } catch (err: unknown) {
+    console.error("Register error:", err);
+
+    const error = err as BetterAuthError;
+
+    if (error?.body?.code === "EMAIL_ALREADY_EXISTS") {
+      return {
+        success: false,
+        message: "This email is already registered.",
+        field: "email",
+      };
+    }
+
+    return {
+      success: false,
+      message:
+        error?.body?.message ||
+        error?.message ||
+        "User registration failed.",
+      field: "general",
+    };
+  }
+};
+
+/* =========================
+   LOGIN USER
+========================= */
+export const loginUser = async (
+  prevState: ActionState | null,
+  formData: FormData
+): Promise<ActionState> => {
+  const email = formData.get("email")?.toString().trim();
+  const password = formData.get("password")?.toString();
+
+  if (!email) {
+    return { success: false, message: "Email is required.", field: "email" };
+  }
+
+  if (!password) {
+    return { success: false, message: "Password is required.", field: "password" };
+  }
+
+  try {
+    await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+        rememberMe: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: "User logged in successfully.",
+      field: "general",
+    };
+  } catch (err: unknown) {
+    console.error("Login error:", err);
+
+    const error = err as BetterAuthError;
+
+    return {
+      success: false,
+      message:
+        error?.body?.message ||
+        error?.message ||
+        "Invalid email or password.",
+      field: "general",
+    };
+  }
+};
+
+/* =========================
+   LOGOUT USER
+========================= */
+export const logoutUser = async (): Promise<ActionState> => {
+  try {
+    await auth.api.signOut();
+
+    return {
+      success: true,
+      message: "User logged out successfully.",
+    };
+  } catch (err: unknown) {
+    console.error("Logout error:", err);
+
+    return {
+      success: false,
+      message: "Logout failed.",
+    };
+  }
+};

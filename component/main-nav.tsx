@@ -16,7 +16,7 @@ export function MainNav() {
           <Link href="/movies" className="hover:text-primary text-sm font-medium transition-colors">Movies</Link>
           <Link href="/genres" className="hover:text-primary text-sm font-medium transition-colors">Genres</Link>
           <Link href="/counter" className="hover:text-primary text-sm font-medium transition-colors">About</Link>
-          <Link href="/movies" className="hover:text-primary text-sm font-medium transition-colors">Admin</Link>
+          <Link href="/dashboard" className="hover:text-primary text-sm font-medium transition-colors">Admin</Link>
           
  
             <ModeToggle />

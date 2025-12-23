@@ -1,8 +1,32 @@
-export default function DashboardPage() {
-   return (
-      <div className="container mx-auto p-4">
-         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-         <p>Welcome to your dashboard!</p>
-      </div>
-   );
+import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import DashboardLayout from "./layout";
+
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const handleLogout = async () => {
+    "use server";
+
+    await auth.api.signOut({
+      headers: await headers(),
+    });
+
+    redirect("/login");
+  };
+
+  console.log("User session:", session);
+
+  return (
+    <DashboardLayout />
+   
+  );
 }
