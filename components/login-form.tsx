@@ -94,7 +94,7 @@ export function LoginForm({
                 >
                   {state?.field === "general" ? state?.message : null}
                 </FieldError>
-                <Button type="submit" disabled={isPending}>
+                <Button type="submit" disabled={isPending} className="cursor-pointer hover:bg-primary/80">
                   Login
                 </Button>
                 <Button variant="outline" type="button" disabled={isPending}>

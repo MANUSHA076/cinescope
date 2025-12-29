@@ -1,19 +1,25 @@
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import AdminHeader from "@/component/dashboard/admin-header";
+import AdminSidebar from "@/component/dashboard/admin-sidebar";
 
 
-export default function DashboardLayout() {
+export default function DashboardLayout({ children, }: Readonly<{ children: React.ReactNode }>)
+{
    return (
    
-      <div className="flex flex-row min-h-screen">
+      <SidebarProvider>
          {/* Sidebar can be added here in future */}
-         <div className="bg-amber-300 flex-1">I&apos;m the slidebar</div>
+         <AdminSidebar />
+         <SidebarInset>
+        
 
-         <div className="flex flex-col bg-green-300 flex-5">
-            <div className="bg-pink-400 flex-1">HEader</div>
-            <div className="bg-indigo-400 flex-12">Content</div>
+         
+            <AdminHeader />
+            <main className="flex-1 p-4  md:pd-8">{children}</main>
+         </SidebarInset>
             
-            
-         </div>
-      </div>
+        
+      </SidebarProvider>
    
   
    
