@@ -69,7 +69,7 @@ export default function AdminSidebar() {
             <SidebarGroupLabel>Menu</SidebarGroupLabel>
 
             <SidebarGroupContent>
-               <SidebarMenu className="space-y-1" >
+               <SidebarMenu className="space-y-2" >
                   
                   {menuItems.map((item) => (
                      <SidebarMenuItem key={item.title}>
@@ -95,7 +95,7 @@ export default function AdminSidebar() {
                <SidebarGroupLabel>Account</SidebarGroupLabel>
                <SidebarGroupContent>
 
-                  <SidebarMenu className="space-y-1" >
+                  <SidebarMenu className="space-y-2" >
                      {AccountItems.map((item) => (
                         <SidebarMenuItem key={item.title}>
                            <SidebarMenuButton className={isActive(item) ? "bg-primary/30 font-medium" : ""} asChild>

@@ -15,7 +15,7 @@ export default function DashboardLayout({ children, }: Readonly<{ children: Reac
 
          
             <AdminHeader />
-            <main className="flex-1 p-4  md:pd-8">{children}</main>
+            <main className="flex-1 p-4  md:p-8">{children}</main>
          </SidebarInset>
             
         
